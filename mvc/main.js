@@ -187,3 +187,4 @@ function fakeData() {
 controller.init({
   view, model
 })
+
