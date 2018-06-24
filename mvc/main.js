@@ -5,13 +5,11 @@ fakeData()
 function Model(options) {
   this.data = options.data
   this.resource = options.resource
-
 }
 
 
 Model.prototype.fetch = function(id) {
   return axios.get(`/${this.resource}/${id}`).then((response) => {
-
     this.data = response.data
     return response
   })
@@ -20,9 +18,6 @@ Model.prototype.fetch = function(id) {
 
 Model.prototype.update = function(data) {
   let id = this.data.id
-  console.log('update:', data)
-  console.log(`${this.resource}`, `${id}`)
-
   return axios.put(`/${this.resource}/${id}`, data)
 }
 
@@ -35,12 +30,7 @@ let model = new Model({
     id: '',
   },
   resource: 'books'
-
 })
-
-window.model = model
-
-
 
 
 //define View
@@ -50,6 +40,7 @@ function View({
   this.el = el
   this.template = template
 }
+
 
 // 定义模板渲染机制
 View.prototype.render = function(data) {
@@ -61,6 +52,7 @@ View.prototype.render = function(data) {
   $(this.el).html(html)
 }
 
+
 // Instanciate view
 let view = new View({
   el: '#app',
@@ -69,18 +61,17 @@ let view = new View({
       书名: __name__  
       数量: <span id='count'>__number__</span>
       </div>
-  
   <div>
     <button id='addOne'>加一</button>
     <button id='minusOne'>减一</button>
     <button id='reset'>归零</button>
   </div>
-`
+    `
 })
+
 
 // define controller
 // use init() to bind view, model to controller, and render html for initiation 
-
 var controller = {
   init(options) {
       let {
@@ -90,50 +81,34 @@ var controller = {
       // 初次渲染 view 节点
       this.view = view
       this.model = model
-
       this.view.render(this.model.data)
       this.bindEvents()
 
-      // 渲染请求第一本书获得的数据.
+      // 进行第一次请求并渲染节点 
       this.model.fetch(1).then(({}) => {
         this.view.render(this.model.data)
-
       })
     },
     addOne() {
-      console.log('addOne()')
-
       let oldNumber = $('#count').text() - 0
       let newNumber = oldNumber + 1
-
-
-      // bug start here================================
       this.model.update({
         number: newNumber
       }).then(() => {
-
         this.view.render(this.model.data)
-
-        // bug end here===================================
-        console.log("this.model.data:", this.model.data)
       })
     },
     minusOne() {
       let oldNumber = $('#count').text() - 0
       let newNumber = oldNumber - 1
-
       this.model.update({
         number: newNumber
       }).then(() => {
         this.view.render(this.model.data)
       })
-
-
     },
     reset() {
-
       let newNumber = 0
-
       this.model.update({
         number: newNumber
       }).then(() => {
@@ -141,16 +116,11 @@ var controller = {
       })
     },
     bindEvents() {
-
       $(this.view.el).on('click', '#addOne', this.addOne.bind(this))
-
       $(this.view.el).on('click', '#minusOne', this.minusOne.bind(this))
-
       $(this.view.el).on('click', '#reset', this.reset.bind(this))
     }
 }
-
-
 
 
 // Initiate variable book. Globally activate axios.interceptors
@@ -164,7 +134,6 @@ function fakeData() {
 
   //axios拦截器, 拦截并处理 response
   axios.interceptors.response.use(function(response) {
-
     let {
       url, method, data
     } = response.config
@@ -173,16 +142,14 @@ function fakeData() {
       response.data = book
     } else if (url === "/books/1" && method == "put") {
 
-      console.log('put data:', data)
       data = JSON.parse(data)
       Object.assign(book, data)
       response.data = book
     }
-
+      
     return response
   })
 }
-
 
 controller.init({
   view, model
